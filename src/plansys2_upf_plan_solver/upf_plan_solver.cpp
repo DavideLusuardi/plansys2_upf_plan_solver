@@ -39,11 +39,10 @@ UPFPlanSolver::UPFPlanSolver()
 void
 UPFPlanSolver::configure(rclcpp_lifecycle::LifecycleNode::SharedPtr & node, const std::string & id)
 {
-  if (!node->has_parameter(id + ".solver")) {
+  if (!node->has_parameter(id + ".solver") || !node->get_parameter(id + ".solver", upf_solver_) ||
+      upf_solver_ == "") {
     RCLCPP_INFO(node->get_logger(), "UPF solver not defined, using the default one");
     upf_solver_ = "popf";
-  } else {
-    node->get_parameter(id + ".solver", upf_solver_);
   }
 
   RCLCPP_INFO(node->get_logger(), "UPF solver %s", upf_solver_.c_str());
@@ -90,7 +89,6 @@ UPFPlanSolver::getPlan(
 
   if (plan_file.is_open()) {
     while (getline(plan_file, line)) {
-      std::cout << line << '\n';
       plansys2_msgs::msg::PlanItem item;
       size_t colon_pos = line.find(":");
       size_t colon_par = line.find(")");
